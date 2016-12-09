@@ -1,3 +1,7 @@
+function _2Decimals(num) {
+  return Math.round(num * 100) / 100;
+}
+
 $('#add-food-button').on('click', function() {
   $('#add-food-panel').slideToggle(300);
 });
@@ -7,7 +11,7 @@ $foodSearch = $('#food-search-input');
 $foodSearch.on('change', function(e) {
   $query = $(this).val();
   $.getJSON(
-    'https://api.nal.usda.gov/ndb/search/?format=json&sort=n&max=200&offset=0&api_key=omcaFN9P4v5xb3l2VM7EqPyxwWRPjkg31EivJ4Jb&q=' +
+    'https://api.nal.usda.gov/ndb/search/?format=json&sort=n&max=10&offset=0&api_key=omcaFN9P4v5xb3l2VM7EqPyxwWRPjkg31EivJ4Jb&q=' +
     encodeURIComponent($query),
     function(res) {
       if (res.errors) {
@@ -47,6 +51,10 @@ $foodSearch.on('change', function(e) {
             itemNameTrimmed += brand;
           }
           li_element.innerHTML = itemNameTrimmed;
+          var chooseFoodButton = document.createElement('button');
+          $(chooseFoodButton).addClass('btn').addClass('btn-primary')
+            .html('Add Food Eaten').css('float', 'right');
+          $(li_element).append($(chooseFoodButton));
           li_element.style.display = 'none';
           $list.append(li_element);
           $(li_element).slideDown();
@@ -75,8 +83,7 @@ $(document).on('click', '.search-result-list li', function() {
         $(divToExpand).css('display', 'none').css(
           'background-color', '#f3f3f3').css('padding',
           '5px 20px').css('color', '#313534');
-        var listOfNutrients = document.createElement('ul');
-        $(listOfNutrients).addClass('nutrientList');
+
 
 
         $foodObject = res.report.food;
@@ -99,11 +106,19 @@ $(document).on('click', '.search-result-list li', function() {
 
         /* ============ Measure got $measuresArray = [{measure: ..., weightOfMeasure: ...g}] =========*/
 
+        var div3 = document.createElement('div');
+        $(div3).addClass('col-sm-3');
+        var inputAmount = document.createElement('input');
+        $(inputAmount).addClass('form-control');
+        $(inputAmount).attr('value', ($nutrientsArray[0].measures[0].qty))
+          .attr('type', 'text');
+
         $(divToExpand).html(
-          '<div class="col-sm-1"><strong>Amount:</strong></div><div class="col-sm-3"><input value="' +
-          ($nutrientsArray[0].measures[0].qty) +
-          '" class="form-control" type="text"></div>'
+          '<div class="col-sm-1"><strong>Amount:</strong></div>'
         );
+        $(div3).append(inputAmount);
+        $(divToExpand).append(div3);
+
         var dropdown = document.createElement('div');
         $(dropdown)
           .addClass('col-sm-4') /*.addClass('col-sm-offset-2');*/ ;
@@ -123,35 +138,75 @@ $(document).on('click', '.search-result-list li', function() {
           '<br/><hr/><h5> Nutrients <h5>');
 
         function updateList(amount, preferedMeasure) {
+          var listOfNutrients = document.createElement('ul');
+          $(listOfNutrients).addClass('nutrientList');
+
           $.each($nutrientsArray, function(index, value) {
             $nutrientName = value.name;
             $unit = value.unit;
-            $valuePerMeasure = value.value;
+            $valuePerHundredGrams = value.value;
             $measures = value.measures;
+
             $defaultMeasure = $measures[0].label;
-            $defaultMeasureAmount = $measures[0].qty;
+            $defaultMeasureQuantity = $measures[0].qty;
+            $defaultMeasureValue = $measures[0].value;
+
             $measureChoosen = "";
             $measureChoosenAmount = "";
+            $measureChoosenValue = "";
+            $valueOfNutrient = "";
+
             if (preferedMeasure) {
-              console.log(another);
+              $.each($measures, function(ind, measureObj) {
+                if (measureObj.label == preferedMeasure) {
+                  $measureChoosen = measureObj.label;
+                  $measureChoosenAmount = measureObj.qty;
+                  $measureChoosenValue = measureObj.value;
+                }
+              });
             } else {
               $measureChoosen = $defaultMeasure;
-              $measureChoosenAmount = $defaultMeasureAmount;
+              $measureChoosenAmount = $defaultMeasureQuantity;
+              $measureChoosenValue = $defaultMeasureValue;
+            }
+
+            if (amount) {
+              $measureChoosenAmount = amount;
+              $valueOfNutrient = $measureChoosenValue *
+                $measureChoosenAmount;
+            } else {
+              $valueOfNutrient = $defaultMeasureValue;
             }
             var li = document.createElement('li');
-            $(li).html("<strong>" + $nutrientName +
+            $(li).html(
+              "<strong>" + $nutrientName +
               "</strong> : " +
               "<span class='value-per-measure'>" +
-              $valuePerMeasure + $unit +
+              _2Decimals($valueOfNutrient) + $unit +
               "</span> <span class='per-tag'>/per " +
-              $measureChoosenAmount + " " + $measureChoosen +
+              _2Decimals($measureChoosenAmount) + " " +
+              $measureChoosen +
               "</span>");
             $(listOfNutrients).append($(li));
           });
+
+          if ($(divToExpand).find('.nutrientList').length !== 0) {
+            $(divToExpand).find('.nutrientList').remove();
+          }
           $(divToExpand).append($(listOfNutrients));
+
+
         }
 
-        updateList(1);
+        updateList();
+
+        $(select).on('change', function(e) {
+          updateList($(inputAmount).val(), e.target.value);
+        });
+
+        $(inputAmount).on('change keyup paste', function(e) {
+          updateList(e.target.value, $(select).val());
+        });
 
         $element.append($(divToExpand));
         $(divToExpand).slideDown();

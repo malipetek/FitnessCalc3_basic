@@ -10,6 +10,12 @@
 #add-food-panel .panel-body > div{
   margin: 5px 0;
 }
+
+.search-result-list>li{
+  padding: 20px;
+  font-size: 12px;
+  height: auto;
+}
 ul.nutrientList>li:nth-child(2n) {
     background-color: #ddd;
 }
