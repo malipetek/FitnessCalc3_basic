@@ -13,7 +13,6 @@
 
 .search-result-list>li{
   padding: 20px;
-  font-size: 12px;
   height: auto;
 }
 ul.nutrientList>li:nth-child(2n) {
