@@ -1,0 +1,28 @@
+*{
+  box-sizing: border-box;
+}
+
+#add-food-panel{
+  margin: 5px 0;
+  height: auto;
+}
+
+#add-food-panel .panel-body > div{
+  margin: 5px 0;
+}
+ul.nutrientList>li:nth-child(2n) {
+    background-color: #ddd;
+}
+ul.nutrientList>li{
+    margin: 3px 0;
+    font-size: 12px;
+}
+ul.nutrientList{
+  list-style: none;
+}
+.value-per-measure{
+  font-size: 14px;
+}
+.per-tag{
+  color: #9d9d9d;
+}
