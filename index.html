@@ -38,46 +38,54 @@
 	<div class="container">
 		<div class="row" style="">
 			<div class="col-md-12 col-sm-12 main">
-				<button class="btn btn-primary" id="add-food-button"> Add Food</button>
-				<button class="btn btn-primary" id="add-exercise">Add exercise</button>
+
 			</div>
 		</div>
-		<div class="row">
-			<div class="container">
-				<div class="col-md-12 form-panel" id="add-food-panel">
+
+				<div class="col-md-12 form-panel" id="add-food-panel" style="display:none">
 					<div class="panel panel-primary">
-						<div class="panel-heading">Add a meal</div>
+						<div class="panel-heading">Add food to meal
+							<span class="pull-right glyphicon glyphicon-remove close-food-panel"></span></div>
 						<div class="panel-body">
-							<h2>Add a meal</h2>
-
-							<label class="control-label col-sm-2">Add Food: </label>
-							<div class="col-sm-10">
-
-
+							<div class="col-sm-8">
 								<input type="text" class="form-control" id="food-search-input" placeholder="Type to search">
-
-
 							</div>
-
-
+							<div class="col-sm-4">
+							<button class="btn btn-primary" id='search-button'>Search food</button>
+							</div>
 							<div class="col-sm-12">
-									<div class="panel panel-primary search-result-panel" style="display:none">
-										<div class="panel-heading">Choose from list</div>
-										<div class="panel-body">
-											<ul class="list-group search-result-list">
-												<!--Food search content comes here -->
-											</ul>
-										</div>
-									</div>
+								<div class="search-result-panel" style="display:none">
+									<ul class="list-group search-result-list">
+										<!--Food search content comes here -->
+									</ul>
 								</div>
-
+							</div>
 						</div>
-
-
-
 					</div>
 				</div>
+
+		<div class="row day-container">
+			<div class="col-md-8 day-row">
+				<h4>Breakfast</h4>
+				<button class="btn btn-primary add-food-button"> Add Food</button>
+				<button class="btn btn-primary add-exercise">Add exercise</button>
+			<hr/>
+			<div class="col-md-12 added-food"></div>
 			</div>
+				<div class="col-md-8 day-row">
+			<h4>Launch</h4>
+			<button class="btn btn-primary add-food-button"> Add Food</button>
+			<button class="btn btn-primary add-exercise">Add exercise</button>
+			<hr/>
+				<div class="col-md-12 added-food"></div>
+		</div>
+				<div class="col-md-8 day-row">
+			<h4>Dinner</h4>
+			<button class="btn btn-primary add-food-button"> Add Food</button>
+			<button class="btn btn-primary add-exercise">Add exercise</button>
+			<hr/>
+				<div class="col-md-12 added-food"></div>
+		</div>
 		</div>
 	</div>
 	</div>

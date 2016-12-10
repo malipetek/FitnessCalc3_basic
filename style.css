@@ -12,7 +12,7 @@
 }
 
 .search-result-list>li{
-  padding: 20px;
+  padding: 10px 20px;
   height: auto;
 }
 ul.nutrientList>li:nth-child(2n) {
@@ -30,4 +30,17 @@ ul.nutrientList{
 }
 .per-tag{
   color: #9d9d9d;
+}
+.day-row{
+  margin: 5px;
+  min-height: 150px;
+  border-width: 1px 1px 1px 1px;
+  border-color: #ccc;
+  border-style: solid;
+}
+.day-container h5{
+  margin: 5px;
+}
+.day-container hr{
+  border-color: #ccc;
 }

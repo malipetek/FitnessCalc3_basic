@@ -2,14 +2,19 @@ function _2Decimals(num) {
   return Math.round(num * 100) / 100;
 }
 
-$('#add-food-button').on('click', function() {
+$('.add-food-button').on('click', function(e) {
+  $(this).parent().append($('#add-food-panel'));
   $('#add-food-panel').slideToggle(300);
+  console.log(e);
 });
 
 $foodSearch = $('#food-search-input');
 
-$foodSearch.on('change', function(e) {
-  $query = $(this).val();
+$foodSearch.on('change', searchFood);
+//$('#search-button').on('click', searchFood);
+
+function searchFood(e) {
+  $query = $('#food-search-input').val();
   $.getJSON(
     'https://api.nal.usda.gov/ndb/search/?format=json&sort=n&max=10&offset=0&api_key=omcaFN9P4v5xb3l2VM7EqPyxwWRPjkg31EivJ4Jb&q=' +
     encodeURIComponent($query),
@@ -50,20 +55,22 @@ $foodSearch.on('change', function(e) {
             });
             itemNameTrimmed += brand;
           }
-          li_element.innerHTML = itemNameTrimmed;
-          var chooseFoodButton = document.createElement('button');
-          $(chooseFoodButton).addClass('btn').addClass('btn-primary')
-            .html('Add Food Eaten').css('float', 'right');
-          $(li_element).append($(chooseFoodButton));
+          $(li_element).html("<i class='fa fa-cutlery'></i><span>" +
+            itemNameTrimmed + "<span>").
+          find('span').css('display', 'inline-block').
+          css('width', 'auto').parent().find('i').css('padding',
+            '5px');
+
           li_element.style.display = 'none';
           $list.append(li_element);
           $(li_element).slideDown();
         });
       }
     });
-});
+}
 
-$(document).on('click', '.search-result-list li', function() {
+$(document).on('click', '.search-result-list li', function(e) {
+  console.log($(this));
   $element = $(this);
   $val = $(this).text();
   $dbid = $(this).attr('data-food-db-no');
@@ -82,7 +89,8 @@ $(document).on('click', '.search-result-list li', function() {
         var divToExpand = document.createElement('ul');
         $(divToExpand).css('display', 'none').css(
           'background-color', '#f3f3f3').css('padding',
-          '5px 20px').css('color', '#313534');
+          '15px').css('color', '#313534').css('margin',
+          '10px 0 0 0').addClass('divtoexpand');
 
 
 
@@ -114,17 +122,23 @@ $(document).on('click', '.search-result-list li', function() {
           .attr('type', 'text');
 
         $(divToExpand).html(
-          '<div class="col-sm-1"><strong>Amount:</strong></div>'
+          '<div class="col-sm-3"><strong>Amount:</strong></div>'
         );
         $(div3).append(inputAmount);
         $(divToExpand).append(div3);
 
         var dropdown = document.createElement('div');
         $(dropdown)
-          .addClass('col-sm-4') /*.addClass('col-sm-offset-2');*/ ;
+          .addClass('col-sm-3') /*.addClass('col-sm-offset-2');*/ ;
         var select = document.createElement('select');
-        $(select).addClass(
-          'form-control');
+        $(select).addClass('form-control');
+
+        var buttonDiv = document.createElement('div');
+        var chooseFoodButton = document.createElement('button');
+        $(chooseFoodButton).addClass('btn').addClass('btn-sm').addClass(
+          'btn-primary').html('Add Food');
+        $(buttonDiv).addClass('col-sm-3').append($(chooseFoodButton));
+
         $.each($measuresArray, function(ind,
           obj) {
           var option = document.createElement('option');
@@ -134,6 +148,7 @@ $(document).on('click', '.search-result-list li', function() {
         $(dropdown).append($(select));
         $(divToExpand).append(
           $(dropdown));
+        $(divToExpand).append($(buttonDiv));
         $(divToExpand).append(
           '<br/><hr/><h5> Nutrients <h5>');
 
@@ -171,9 +186,8 @@ $(document).on('click', '.search-result-list li', function() {
             }
 
             if (amount) {
-              $measureChoosenAmount = amount;
-              $valueOfNutrient = $measureChoosenValue *
-                $measureChoosenAmount;
+              $valueOfNutrient = ($measureChoosenValue /
+                $measureChoosenAmount) * amount;
             } else {
               $valueOfNutrient = $defaultMeasureValue;
             }
@@ -184,7 +198,7 @@ $(document).on('click', '.search-result-list li', function() {
               "<span class='value-per-measure'>" +
               _2Decimals($valueOfNutrient) + $unit +
               "</span> <span class='per-tag'>/per " +
-              _2Decimals($measureChoosenAmount) + " " +
+              _2Decimals(amount) + " " +
               $measureChoosen +
               "</span>");
             $(listOfNutrients).append($(li));
@@ -198,7 +212,7 @@ $(document).on('click', '.search-result-list li', function() {
 
         }
 
-        updateList();
+        updateList($(inputAmount).val());
 
         $(select).on('change', function(e) {
           updateList($(inputAmount).val(), e.target.value);
@@ -213,5 +227,14 @@ $(document).on('click', '.search-result-list li', function() {
       }
     });
 
+  } else {
+    $element.find('.divtoexpand').slideToggle();
   }
+})
+$(document).on('click', '.divtoexpand', function(e) {
+  return false;
+});
+
+$(document).on('click', '.close-food-panel', function() {
+  $(this).parent().parent().parent().slideUp();
 });
