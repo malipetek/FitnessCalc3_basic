@@ -238,3 +238,22 @@ $(document).on('click', '.divtoexpand', function(e) {
 $(document).on('click', '.close-food-panel', function() {
   $(this).parent().parent().parent().slideUp();
 });
+
+/////////////// DATE PICKER /////////////////////
+var currentDate = new Date();
+$("#datepicker").datepicker({
+  showOn: "button",
+  buttonText: '<span style="font-size: 16px; padding: 5px" class="glyphicon glyphicon-calendar"></span>',
+  buttonImageOnly: false,
+  dateFormat: 'DD, dd MM yy'
+}).datepicker('setDate', currentDate);
+
+$('.next-day-button').click(function(e) {
+  currentDate.setDate(currentDate.getDate() + 1);
+  $("#datepicker").datepicker('setDate', currentDate);
+});
+$('.prev-day-button').click(function(e) {
+  currentDate.setDate(currentDate.getDate() - 1)
+  $("#datepicker").datepicker('setDate', currentDate);
+});
+/////////////// DATE PICKER /////////////////////
