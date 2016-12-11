@@ -263,7 +263,7 @@ function addFoodToMeal(e) {
   $mealContainer.find('.added-food').append($cloned);
   $cloned.find('.divtoexpand').slideUp();
 
-  console.log($text);
+  //console.log($text);
 }
 
 /////////////// DATE PICKER /////////////////////
