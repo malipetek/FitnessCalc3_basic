@@ -1,8 +1,154 @@
+var dummyobj = {
+  "meals": [{
+    "foodConsumptions": [{
+      "food": {
+        "id": 1,
+        "jsonData": "{ sample json data }",
+        "name": "Apple"
+      },
+      "quantity": 100,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }, {
+      "food": {
+        "id": 1,
+        "jsonData": "{ sample json data }",
+        "name": "Apple"
+      },
+      "quantity": 100,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }, {
+      "food": {
+        "id": 2,
+        "jsonData": "{ sample json data }",
+        "name": "Bread"
+      },
+      "quantity": 1,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "mg"
+      }
+    }],
+    "mealDay": 20161211,
+    "mealId": 8,
+    "mealType": "BREAKFAST"
+  }, {
+    "foodConsumptions": [{
+      "food": {
+        "id": 3,
+        "jsonData": "{ sample json data }",
+        "name": "Coffee"
+      },
+      "quantity": 5.75,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "IU"
+      }
+    }, {
+      "food": {
+        "id": 4,
+        "jsonData": "{ sample json data }",
+        "name": "Grape"
+      },
+      "quantity": 500,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }],
+    "mealDay": 20161211,
+    "mealId": 9,
+    "mealType": "LUNCH"
+  }, {
+    "foodConsumptions": [{
+      "food": {
+        "id": 5,
+        "jsonData": "{ sample json data }",
+        "name": "Cheese"
+      },
+      "quantity": 500,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }, {
+      "food": {
+        "id": 5,
+        "jsonData": "{ sample json data }",
+        "name": "Cheese"
+      },
+      "quantity": 250,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }, {
+      "food": {
+        "id": 6,
+        "jsonData": "{ sample json data }",
+        "name": "Pizza"
+      },
+      "quantity": 100,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "g"
+      }
+    }],
+    "mealDay": 20161211,
+    "mealId": 10,
+    "mealType": "DINNER"
+  }, {
+    "foodConsumptions": [{
+      "food": {
+        "id": 8,
+        "jsonData": "{ sample json data }",
+        "name": "Eggplant"
+      },
+      "quantity": 100,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "Âµg"
+      }
+    }, {
+      "food": {
+        "id": 9,
+        "jsonData": "{ sample json data }",
+        "name": "Corn"
+      },
+      "quantity": 100,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "Âµg"
+      }
+    }, {
+      "food": {
+        "id": 9,
+        "jsonData": "{ sample json data }",
+        "name": "Corn"
+      },
+      "quantity": 2,
+      "unit": {
+        "foodUnitId": 0,
+        "name": "portion"
+      }
+    }],
+    "mealDay": 20161211,
+    "mealId": 11,
+    "mealType": "SNACK"
+  }],
+  "userId": 1
+};
+
 function _2Decimals(num) {
   return Math.round(num * 100) / 100;
 }
 
-$('.add-food-button').on('click', function(e) {
+$(document).on('click', '.add-food-button', function(e) {
   $(this).parent().append($('#add-food-panel'));
   $('#add-food-panel').slideToggle(300);
   console.log(e);
@@ -254,35 +400,82 @@ function addFoodToMeal(e) {
   $amount = $item.find('.amount-selection').val();
 
   $cloned = $item.clone();
+  $cloned.attr('data-amount', $amount).attr(
+    'data-unit', $unit).attr('data-label', $label);
   $labelCl = $cloned.children('span');
   $labelCl.append('<span class="per-tag">' + $amount + ' ' + $unit +
     '</span>');
   $(
     '<span class="pull-right glyphicon glyphicon-remove food-saved-remove"></span>'
   ).insertAfter($labelCl);
+  $cloned.css('transform', 'scale(1.1)');
   $mealContainer.find('.added-food').append($cloned);
-  $cloned.find('.divtoexpand').slideUp();
+  $cloned.find('.divtoexpand').hide();
+  $item.find('.divtoexpand').slideUp();
+  $cloned.css('transform', 'scale(1)');
 
   //console.log($text);
 }
 
 /////////////// DATE PICKER /////////////////////
+var today = new Date();
 var currentDate = new Date();
 $("#datepicker").datepicker({
   showOn: "button",
   buttonText: '<span style="font-size: 16px; padding: 5px" class="glyphicon glyphicon-calendar"></span>',
   buttonImageOnly: false,
-  dateFormat: 'DD, dd MM yy'
+  dateFormat: 'DD, dd.mm.yy'
 }).datepicker('setDate', currentDate);
+dateChangeHandler();
 
 $('.next-day-button').click(function(e) {
   currentDate.setDate(currentDate.getDate() + 1);
   $("#datepicker").datepicker('setDate', currentDate);
+  dateChangeHandler();
 });
 $('.prev-day-button').click(function(e) {
   currentDate.setDate(currentDate.getDate() - 1)
   $("#datepicker").datepicker('setDate', currentDate);
+  dateChangeHandler();
 });
+
+$('#datepicker').on('change', dateChangeHandler);
+
+$('.day-container').attr('data-date', currentDate.toDateString());
+
+
+
+function dateChangeHandler() {
+  $newDate = $('#datepicker').datepicker('getDate').toDateString();
+  if ($newDate == today.toDateString()) {
+    $('#datepicker').css('background-color', '#eee');
+  } else {
+    $('#datepicker').css('background-color', '#fff');
+  }
+
+
+
+  if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {
+    $('.day-container').fadeOut();
+
+
+    $newDay = $('.day-container-template').clone();
+    $('.content').append($newDay);
+    $newDay.attr('class', 'row').addClass('day-container').attr(
+      'data-date', $newDate).fadeIn();
+  } else {
+    $('.day-container').fadeOut();
+    $('.day-container[data-date="' + $newDate + '"]').fadeIn();
+  }
+  /*  $.each($detachedDates, function(ind, val) {
+      console.log(ind);
+      console.log(val);
+      console.log('date of detached: ' + val.attr('data-date'));
+    });*/
+
+  console.log($newDate);
+  console.log(today.toDateString());
+}
 /////////////// DATE PICKER /////////////////////
 
 var CalcUserData = function() {
@@ -303,3 +496,52 @@ var CalcUserData = function() {
 
   };
 }
+
+function wrapToJson(dayContainerElement) {
+  $(dayContainerElement).find('.breakfast')
+
+  function saveLists(meal) {
+    $foods = $(dayContainerElement).find('.' + meal).find('.added-food').find(
+      'li');
+    $exercises = $(dayContainerElement).find('.' + meal).find('.added-exercise')
+      .find('li');
+    foodsArray = [];
+    excercisesArray = [];
+    $.each($foods, function(ind, val) {
+      $label = val.attr('data-label');
+      $amount = val.attr('data-amount');
+      $unit = val.attr('data-unit');
+      $ndbno = val.attr('data-food-db-no');
+      foodObject = {
+        foodName: $label,
+        ndbno: $ndbno,
+        amount: $amount,
+        unit: $unit
+      };
+      foodsArray.push(foodObject);
+    });
+  }
+}
+/* userData = {
+  user: {
+    userid: 'UserId',
+    dates: [{
+      date: date();
+      meals: {
+        breakfast: [foodsArray],
+        launch: [foodsArray],
+        dinner: [foodsArray],
+        snacks: [foodsArray]
+      },
+      excercises: [excercisesArray]
+    }]
+  }
+}
+food = {
+  label: "string",
+  ndbno: "number",
+  amount: "number",
+  unit: "string",
+  value: "gram equivalent of amount/unit"
+}
+*/

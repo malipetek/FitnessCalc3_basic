@@ -1,6 +1,11 @@
 *{
   box-sizing: border-box;
 }
+html, body{
+  width: 99.9%;
+  height: 100%;
+  overflow-x: hidden;
+}
 
 #add-food-panel{
   margin: 5px 0;
@@ -37,6 +42,7 @@ ul.nutrientList{
   border-width: 1px 1px 1px 1px;
   border-color: #ccc;
   border-style: solid;
+  padding: 15px;
 }
 .day-container h5{
   margin: 5px;
@@ -49,4 +55,12 @@ ul.nutrientList{
 }
 .search-result-list>li:hover{
   background-color: #eee;
+}
+.inline-h4{
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 10px;
+}
+.list-group-item{
+  transition: transform 0.2s ease-out;
 }
