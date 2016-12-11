@@ -346,7 +346,7 @@ function dateChangeHandler() {
     console.log($breakfast);
 
     if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {
-      $('.day-container').fadeOut();
+      $('.day-container').fadeOut().remove();
       $newDay = $('.day-container-template').clone();
       $('.content').append($newDay);
       $newDay.attr('class', 'row').addClass('day-container').attr(
