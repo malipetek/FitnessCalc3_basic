@@ -1,149 +1,3 @@
-var dummyobj = {
-  "meals": [{
-    "foodConsumptions": [{
-      "food": {
-        "id": 1,
-        "jsonData": "{ sample json data }",
-        "name": "Apple"
-      },
-      "quantity": 100,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }, {
-      "food": {
-        "id": 1,
-        "jsonData": "{ sample json data }",
-        "name": "Apple"
-      },
-      "quantity": 100,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }, {
-      "food": {
-        "id": 2,
-        "jsonData": "{ sample json data }",
-        "name": "Bread"
-      },
-      "quantity": 1,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "mg"
-      }
-    }],
-    "mealDay": 20161211,
-    "mealId": 8,
-    "mealType": "BREAKFAST"
-  }, {
-    "foodConsumptions": [{
-      "food": {
-        "id": 3,
-        "jsonData": "{ sample json data }",
-        "name": "Coffee"
-      },
-      "quantity": 5.75,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "IU"
-      }
-    }, {
-      "food": {
-        "id": 4,
-        "jsonData": "{ sample json data }",
-        "name": "Grape"
-      },
-      "quantity": 500,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }],
-    "mealDay": 20161211,
-    "mealId": 9,
-    "mealType": "LUNCH"
-  }, {
-    "foodConsumptions": [{
-      "food": {
-        "id": 5,
-        "jsonData": "{ sample json data }",
-        "name": "Cheese"
-      },
-      "quantity": 500,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }, {
-      "food": {
-        "id": 5,
-        "jsonData": "{ sample json data }",
-        "name": "Cheese"
-      },
-      "quantity": 250,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }, {
-      "food": {
-        "id": 6,
-        "jsonData": "{ sample json data }",
-        "name": "Pizza"
-      },
-      "quantity": 100,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "g"
-      }
-    }],
-    "mealDay": 20161211,
-    "mealId": 10,
-    "mealType": "DINNER"
-  }, {
-    "foodConsumptions": [{
-      "food": {
-        "id": 8,
-        "jsonData": "{ sample json data }",
-        "name": "Eggplant"
-      },
-      "quantity": 100,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "Âµg"
-      }
-    }, {
-      "food": {
-        "id": 9,
-        "jsonData": "{ sample json data }",
-        "name": "Corn"
-      },
-      "quantity": 100,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "Âµg"
-      }
-    }, {
-      "food": {
-        "id": 9,
-        "jsonData": "{ sample json data }",
-        "name": "Corn"
-      },
-      "quantity": 2,
-      "unit": {
-        "foodUnitId": 0,
-        "name": "portion"
-      }
-    }],
-    "mealDay": 20161211,
-    "mealId": 11,
-    "mealType": "SNACK"
-  }],
-  "userId": 1
-};
-
 function _2Decimals(num) {
   return Math.round(num * 100) / 100;
 }
@@ -204,7 +58,8 @@ function searchFood(e) {
           $(li_element).html(
             "<i class='fa fa-cutlery'></i><span>" +
             itemNameTrimmed + "</span>").
-          find('span').css('display', 'inline-block').
+          find('span').addClass('food-label').css('display',
+            'inline-block').
           css('width', '80%').parent().find('i').css('padding',
             '5px');
 
@@ -447,34 +302,109 @@ $('.day-container').attr('data-date', currentDate.toDateString());
 
 function dateChangeHandler() {
   $newDate = $('#datepicker').datepicker('getDate').toDateString();
+
+  /*=== === === === CHECK FOR TODAY === === ===*/
   if ($newDate == today.toDateString()) {
     $('#datepicker').css('background-color', '#eee');
   } else {
     $('#datepicker').css('background-color', '#fff');
   }
+  /*=== === === === CHECK FOR TODAY === === ===*/
 
+  $breakfast = [];
+  $lunch = [];
+  $dinner = [];
+  $snack = [];
 
+  $.ajax({
+    url: 'dummyobj.json',
+    type: 'GET',
+    data: {
+      //date: $newDate //yy.mm.dd
+    },
+    success: function(res) {
 
-  if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {
-    $('.day-container').fadeOut();
+      $.each(res.meals, function(ind, obj) {
+        if (obj.mealType == "BREAKFAST") {
+          $breakfast = obj.foodConsumptions;
+        }
+        if (obj.mealType == "LUNCH") {
+          $lunch = obj.foodConsumptions;
+        }
+        if (obj.mealType == "DINNER") {
+          $dinner = obj.foodConsumptions;
+        }
+        if (obj.mealType == "SNACK") {
+          $snack = obj.foodConsumptions;
+        }
+      });
+      updateDay();
+    }
+  });
 
+  function updateDay() {
+    console.log($breakfast);
 
-    $newDay = $('.day-container-template').clone();
-    $('.content').append($newDay);
-    $newDay.attr('class', 'row').addClass('day-container').attr(
-      'data-date', $newDate).fadeIn();
-  } else {
-    $('.day-container').fadeOut();
-    $('.day-container[data-date="' + $newDate + '"]').fadeIn();
+    if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {
+      $('.day-container').fadeOut();
+      $newDay = $('.day-container-template').clone();
+      $('.content').append($newDay);
+      $newDay.attr('class', 'row').addClass('day-container').attr(
+        'data-date', $newDate).fadeIn();
+    } else {
+      $('.day-container').fadeOut();
+      $('.day-container[data-date="' + $newDate + '"]').fadeIn();
+    }
+
+    function foodItemGenerate(label, amount, unit) {
+      $item = $('.food-li-template').clone();
+      $item.css('display', 'block');
+      $item.attr('class', 'list-group-item');
+      $item.attr('data-food-db-no', '');
+      $item.attr('data-label', label);
+      $item.attr('data-amount', amount);
+      $item.attr('data-unit', unit);
+      $perTag = $item.find('.per-tag').text(amount + ' ' + unit).detach();
+      $item.find('.food-label').text(label).append($perTag);
+
+      return $item;
+    }
+
+    $.each($breakfast, function(ind, val) {
+
+      $label = val.food.name;
+      $amount = val.quantity;
+      $unit = val.unit.name;
+
+      console.log($label);
+      $newDay.find('.breakfast').find('.added-food').append(
+        foodItemGenerate($label, $amount, $unit));
+    });
+    $.each($lunch, function(ind, val) {
+      $label = val.food.name;
+      $amount = val.quantity;
+      $unit = val.unit.name;
+      $newDay.find('.lunch').find('.added-food').append(
+        foodItemGenerate($label, $amount, $unit));
+    });
+    $.each($dinner, function(ind, val) {
+      $label = val.food.name;
+      $amount = val.quantity;
+      $unit = val.unit.name;
+      $newDay.find('.dinner').find('.added-food').append(
+        foodItemGenerate($label, $amount, $unit));
+    });
+    $.each($snack, function(ind, val) {
+      $label = val.food.name;
+      $amount = val.quantity;
+      $unit = val.unit.name;
+      $newDay.find('.snack').find('.added-food').append(
+        foodItemGenerate($label, $amount, $unit));
+    });
+
+    console.log($newDate);
+    console.log(today.toDateString());
   }
-  /*  $.each($detachedDates, function(ind, val) {
-      console.log(ind);
-      console.log(val);
-      console.log('date of detached: ' + val.attr('data-date'));
-    });*/
-
-  console.log($newDate);
-  console.log(today.toDateString());
 }
 /////////////// DATE PICKER /////////////////////
 
@@ -503,7 +433,8 @@ function wrapToJson(dayContainerElement) {
   function saveLists(meal) {
     $foods = $(dayContainerElement).find('.' + meal).find('.added-food').find(
       'li');
-    $exercises = $(dayContainerElement).find('.' + meal).find('.added-exercise')
+    $exercises = $(dayContainerElement).find('.' + meal).find(
+        '.added-exercise')
       .find('li');
     foodsArray = [];
     excercisesArray = [];
