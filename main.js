@@ -55,10 +55,11 @@ function searchFood(e) {
             });
             itemNameTrimmed += brand;
           }
-          $(li_element).html("<i class='fa fa-cutlery'></i><span>" +
-            itemNameTrimmed + "<span>").
+          $(li_element).html(
+            "<i class='fa fa-cutlery'></i><span>" +
+            itemNameTrimmed + "</span>").
           find('span').css('display', 'inline-block').
-          css('width', 'auto').parent().find('i').css('padding',
+          css('width', '80%').parent().find('i').css('padding',
             '5px');
 
           li_element.style.display = 'none';
@@ -117,7 +118,8 @@ $(document).on('click', '.search-result-list li', function(e) {
         var div3 = document.createElement('div');
         $(div3).addClass('col-sm-3');
         var inputAmount = document.createElement('input');
-        $(inputAmount).addClass('form-control');
+        $(inputAmount).addClass('form-control').addClass(
+          'amount-selection');
         $(inputAmount).attr('value', ($nutrientsArray[0].measures[0].qty))
           .attr('type', 'text');
 
@@ -131,13 +133,15 @@ $(document).on('click', '.search-result-list li', function(e) {
         $(dropdown)
           .addClass('col-sm-3') /*.addClass('col-sm-offset-2');*/ ;
         var select = document.createElement('select');
-        $(select).addClass('form-control');
+        $(select).addClass('form-control').addClass('unit-selection');
 
         var buttonDiv = document.createElement('div');
         var chooseFoodButton = document.createElement('button');
         $(chooseFoodButton).addClass('btn').addClass('btn-sm').addClass(
           'btn-primary').html('Add Food');
         $(buttonDiv).addClass('col-sm-3').append($(chooseFoodButton));
+
+        $(chooseFoodButton).on('click', addFoodToMeal);
 
         $.each($measuresArray, function(ind,
           obj) {
@@ -239,6 +243,29 @@ $(document).on('click', '.close-food-panel', function() {
   $(this).parent().parent().parent().slideUp();
 });
 
+/*= == == = == = = = = = = = = = == = = = = = =*/
+function addFoodToMeal(e) {
+  $item = $(e.currentTarget).closest('.list-group-item');
+  $mealContainer = $(e.currentTarget).closest('.day-row');
+  $label = $item.children('span').text();
+  $dbno = $item.attr('data-food-db-no');
+
+  $unit = $item.find('.unit-selection').val();
+  $amount = $item.find('.amount-selection').val();
+
+  $cloned = $item.clone();
+  $labelCl = $cloned.children('span');
+  $labelCl.append('<span class="per-tag">' + $amount + ' ' + $unit +
+    '</span>');
+  $(
+    '<span class="pull-right glyphicon glyphicon-remove food-saved-remove"></span>'
+  ).insertAfter($labelCl);
+  $mealContainer.find('.added-food').append($cloned);
+  $cloned.find('.divtoexpand').slideUp();
+
+  console.log($text);
+}
+
 /////////////// DATE PICKER /////////////////////
 var currentDate = new Date();
 $("#datepicker").datepicker({
@@ -257,3 +284,22 @@ $('.prev-day-button').click(function(e) {
   $("#datepicker").datepicker('setDate', currentDate);
 });
 /////////////// DATE PICKER /////////////////////
+
+var CalcUserData = function() {
+  this.dates = [];
+  this.meals = [];
+  this.food = [];
+
+  this.addFood = function() {
+
+  };
+  this.removeFood = function() {
+
+  };
+  this.addDate = function() {
+
+  };
+  this.reportChanges = function() {
+
+  };
+}

@@ -27,14 +27,17 @@
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
 					<div class="navbar-header">
-						<a class="navbar-brand" href="#">WebSiteName</a>
+						<a class="navbar-brand" href="#">Fitness Calc</a>
 					</div>
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="#">Home</a></li>
-						<li><a href="#">Page 1</a></li>
-						<li><a href="#">Page 2</a></li>
-						<li><a href="#">Page 3</a></li>
+						<li><a href="#">My Stats</a></li>
+						<li><a href="#">My Goals</a></li>
+						<li><a href="#">My Nutritient Fullfilment Analysis</a></li>
 					</ul>
+					<ul class="nav navbar-nav" style="float: right">
+					 <li><a href="#" class="navbar-nav pull-right">My Account</a></li>
+				 </ul>
 				</div>
 			</nav>
 		</div>
@@ -71,27 +74,34 @@
 				</div>
 
 		<div class="row day-container">
-			<div class="col-md-8 day-row">
+			<div class="col-md-8 day-row breakfast">
 				<h4>Breakfast</h4>
-				<button class="btn btn-primary add-food-button"> Add Food</button>
-				<button class="btn btn-primary add-exercise">Add exercise</button>
+				<button class="btn btn-default add-food-button"> Add Food</button>
+				<button class="btn btn-default add-exercise">Add exercise</button>
 			<hr/>
-			<div class="col-md-12 added-food"></div>
+			<ul class="col-md-12 added-food"></ul>
 			</div>
-				<div class="col-md-8 day-row">
+				<div class="col-md-8 day-row launch">
 			<h4>Launch</h4>
-			<button class="btn btn-primary add-food-button"> Add Food</button>
-			<button class="btn btn-primary add-exercise">Add exercise</button>
+			<button class="btn btn-default add-food-button"> Add Food</button>
+			<button class="btn btn-default add-exercise">Add exercise</button>
 			<hr/>
-				<div class="col-md-12 added-food"></div>
+				<ul class="col-md-12 added-food"></ul>
 		</div>
-				<div class="col-md-8 day-row">
+				<div class="col-md-8 day-row dinner">
 			<h4>Dinner</h4>
-			<button class="btn btn-primary add-food-button"> Add Food</button>
-			<button class="btn btn-primary add-exercise">Add exercise</button>
+			<button class="btn btn-default add-food-button"> Add Food</button>
+			<button class="btn btn-default add-exercise">Add exercise</button>
 			<hr/>
-				<div class="col-md-12 added-food"></div>
+				<ul class="col-md-12 added-food"></ul>
 		</div>
+		<div class="col-md-8 day-row snack">
+	<h4>Snack</h4>
+	<button class="btn btn-default add-food-button"> Add Food</button>
+	<button class="btn btn-default add-exercise">Add exercise</button>
+	<hr/>
+		<ul class="col-md-12 added-food"></ul>
+</div>
 		</div>
 	</div>
 	</div>

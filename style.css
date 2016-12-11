@@ -44,3 +44,9 @@ ul.nutrientList{
 .day-container hr{
   border-color: #ccc;
 }
+.added-food>li {
+    background-color: #eee;
+}
+.search-result-list>li:hover{
+  background-color: #eee;
+}
