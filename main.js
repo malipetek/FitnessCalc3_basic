@@ -2,6 +2,9 @@ function _2Decimals(num) {
   return Math.round(num * 100) / 100;
 }
 
+historyArray = [];
+futureArray = [];
+
 $(document).on('click', '.add-food-button', function(e) {
   $(this).parent().append($('#add-food-panel'));
   $('#add-food-panel').slideToggle(300);
@@ -476,3 +479,31 @@ food = {
   value: "gram equivalent of amount/unit"
 }
 */
+$(document).on('click', '.food-saved-remove', function() {
+  $element = $(this).parent();
+  $from = $(this).closest('.day-row');
+  $element = $element.detach();
+  var history_obj = {
+    element: $element,
+    removedFrom: $from,
+    restore: function() {
+      $(this.removedFrom).find('.added-food').append($(this.element));
+      futureArray.push(historyArray.pop());
+    },
+    redo: function() {
+      $(this.element).detach();
+      historyArray.push(futureArray.pop());
+    }
+  };
+  historyArray.push(history_obj);
+});
+
+$(document).on('keypress', function(e) {
+  //  console.log(e);
+  if (e.ctrlKey && e.keyCode == 26) {
+    historyArray[historyArray.length - 1].restore();
+  }
+  if (e.ctrlKey && e.keyCode == 25) {
+    futureArray[futureArray.length - 1].redo();
+  }
+});
