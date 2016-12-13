@@ -1,7 +1,39 @@
+var foodSearchUrl = undefined;
+var foodDetailRequestUrl = undefined;
+var addFoodSubmitUrl = undefined;
+var exerciseSearchUrl = undefined;
+var exerciseDetailRequestUrl = undefined;
+var exerciseSubmitUrl = undefined;
+var getDateRequestUrl = undefined;
+
+
+//var foodSearchUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods?q="; //+query
+//var foodDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods/"; //+ndbno
+//var addFoodSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals";
+// (POST) + {	"userId": 1,
+//	"foodId": "45044776",
+//	"quantity": 2,
+//	"unitName": "g",
+//	"day": 20161213,
+//	"mealTypeRef": 1}
+//========================================
+var exerciseSearchUrl =
+  "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities?keyword=";
+//+query
+//var exerciseDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+acitivity Id
+//var exerciseSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+some object
+//============================================
+//var getDateRequestUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals/?startDay="; // +YYYYMMDD
+//============================================*/
+
 function _2Decimals(num) {
   return Math.round(num * 100) / 100;
 }
 
+function getFormattedDate() {
+  return (currentDate.getFullYear() + ('0' + (currentDate.getMonth() + 1)).slice(-
+    2) + ('0' + currentDate.getDate()).slice(-2));
+}
 historyArray = [];
 futureArray = [];
 
@@ -17,61 +49,90 @@ $foodSearch.on('change', searchFood);
 //$('#search-button').on('click', searchFood);
 
 function searchFood(e) {
-  $query = $('#food-search-input').val();
-  $.getJSON(
-    'https://api.nal.usda.gov/ndb/search/?format=json&sort=n&max=10&offset=0&api_key=omcaFN9P4v5xb3l2VM7EqPyxwWRPjkg31EivJ4Jb&q=' +
-    encodeURIComponent($query),
-    function(res) {
-      if (res.errors) {
-        $('.search-result-panel').slideUp();
-      } else {
-        $('.search-result-panel').slideDown();
-        $list = $('.search-result-list');
-        $list.find('li').slideUp('fast', function() {
-          $(this).remove();
-        });
-        var listArray = res.list.item;
-        $.each(listArray, function(index, item) {
-          var li_element = document.createElement(
-            'li');
-          li_element.classList.add('list-group-item');
-          li_element.setAttribute('data-food-db-no',
-            item.ndbno);
-          var splittedArray = item.name.split(',');
-          var firstPart = splittedArray[0];
-          var itemNameTrimmed = "";
-          var brand;
-
-          if (splittedArray.length == 2) {
-            itemNameTrimmed = firstPart;
-          } else {
-            $.each(splittedArray, function(index,
-              item) {
-              if (item.indexOf('UPC') !== -1 ||
-                item.indexOf('GTIN') !== -1) {
-                console.log(item);
-              } else if (index == 0) {
-                brand = "(" + item + ")";
-              } else {
-                itemNameTrimmed += item + ", ";
-              }
-            });
-            itemNameTrimmed += brand;
-          }
-          $(li_element).html(
-            "<i class='fa fa-cutlery'></i><span>" +
-            itemNameTrimmed + "</span>").
-          find('span').addClass('food-label').css('display',
-            'inline-block').
-          css('width', '80%').parent().find('i').css('padding',
-            '5px');
-
-          li_element.style.display = 'none';
-          $list.append(li_element);
-          $(li_element).slideDown();
+  $query = encodeURIComponent($('#food-search-input').val());
+  if (foodSearchUrl !== undefined) {
+    $.ajax({
+      type: "GET",
+      url: "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods",
+      data: {
+        q: $query
+      },
+      success: listResponse,
+      error: function(results) {
+        $.notify({
+          message: 'error searching'
+        }, {
+          type: 'warning'
         });
       }
     });
+  } else {
+    $.ajax({
+      type: "GET",
+      url: 'https://api.nal.usda.gov/ndb/search/',
+      data: {
+        q: $query,
+        api_key: 'omcaFN9P4v5xb3l2VM7EqPyxwWRPjkg31EivJ4Jb',
+        offset: '0',
+        format: 'json',
+        sort: 'n',
+        max: '25'
+      },
+      success: listResponse
+    });
+  }
+
+
+  function listResponse(res) {
+    if (res.errors) {
+      $('.search-result-panel').slideUp();
+    } else {
+      $('.search-result-panel').slideDown();
+      $list = $('.search-result-list');
+      $list.find('li').slideUp('fast', function() {
+        $(this).remove();
+      });
+      var listArray = res.list.item;
+      $.each(listArray, function(index, item) {
+        var li_element = document.createElement(
+          'li');
+        li_element.classList.add('list-group-item');
+        li_element.setAttribute('data-food-db-no',
+          item.ndbno);
+        var splittedArray = item.name.split(',');
+        var firstPart = splittedArray[0];
+        var itemNameTrimmed = "";
+        var brand;
+
+        if (splittedArray.length == 2) {
+          itemNameTrimmed = firstPart;
+        } else {
+          $.each(splittedArray, function(index,
+            item) {
+            if (item.indexOf('UPC') !== -1 ||
+              item.indexOf('GTIN') !== -1) {
+              console.log(item);
+            } else if (index == 0) {
+              brand = "(" + item + ")";
+            } else {
+              itemNameTrimmed += item + ", ";
+            }
+          });
+          itemNameTrimmed += brand;
+        }
+        $(li_element).html(
+          "<i class='fa fa-cutlery'></i><span>" +
+          itemNameTrimmed + "</span>").
+        find('span').addClass('food-label').css('display',
+          'inline-block').
+        css('width', '80%').parent().find('i').css('padding',
+          '5px');
+
+        $list.append(li_element);
+        $(li_element).slideDown();
+      });
+    }
+  }
 }
 
 $(document).on('click', '.search-result-list li', function(e) {
@@ -236,9 +297,10 @@ $(document).on('click', '.search-result-list li', function(e) {
     });
 
   } else {
+
     $element.find('.divtoexpand').slideToggle();
   }
-})
+});
 $(document).on('click', '.divtoexpand', function(e) {
   return false;
 });
@@ -247,7 +309,9 @@ $(document).on('click', '.close-food-panel', function() {
   $(this).parent().parent().parent().slideUp();
 });
 
-/*= == == = == = = = = = = = = = == = = = = = =*/
+/* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
+/* ========================|||||||||||-------ADD ITEM TO DAY----------||||||||||||====================== */
+/* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
 function addFoodToMeal(e) {
   $item = $(e.currentTarget).closest('.list-group-item');
   $mealContainer = $(e.currentTarget).closest('.day-row');
@@ -257,23 +321,79 @@ function addFoodToMeal(e) {
   $unit = $item.find('.unit-selection').val();
   $amount = $item.find('.amount-selection').val();
 
-  $cloned = $item.clone();
-  $cloned.attr('data-amount', $amount).attr(
-    'data-unit', $unit).attr('data-label', $label);
-  $labelCl = $cloned.children('span');
-  $labelCl.append('<span class="per-tag">' + $amount + ' ' + $unit +
-    '</span>');
-  $(
-    '<span class="pull-right glyphicon glyphicon-remove food-saved-remove"></span>'
-  ).insertAfter($labelCl);
-  $cloned.css('transform', 'scale(1.1)');
-  $mealContainer.find('.added-food').append($cloned);
-  $cloned.find('.divtoexpand').hide();
-  $item.find('.divtoexpand').slideUp();
-  $cloned.css('transform', 'scale(1)');
+  var foodObject = {
+    "userId": 1,
+    "foodId": $dbno,
+    "quantity": $amount,
+    "unitName": $unit,
+    "day": getFormattedDate(),
+    "mealTypeRef": 1
+  }
 
-  //console.log($text);
+  if (addFoodSubmitUrl !== undefined) {
+    $.ajax({
+      type: "POST",
+      url: 'addFoodSubmitUrl',
+      data: foodObject,
+      success: function(res) {
+        dateChangeHandler();
+      },
+      error: function(results) {
+        $.notify({
+          message: 'There was an error therefore item only seems added for developing purposes.'
+        }, {
+          type: 'warning'
+        });
+        addByDom();
+      }
+    });
+  } else {
+    addByDom();
+  }
+
+  function addByDom() {
+    $.notify('Food saved to list');
+    $.notify({
+      message: 'Endpoint link is not set therefore item only seems added for developing purposes.'
+    }, {
+      type: 'warning'
+    });
+    $cloned = $item.clone();
+    $cloned.attr('data-amount', $amount).attr(
+      'data-unit', $unit).attr('data-label', $label);
+    $labelCl = $cloned.children('span');
+    $labelCl.append('&nbsp;&nbsp;<span class="per-tag">' + $amount + ' ' +
+      $unit +
+      '</span>');
+    $(
+      '<span class="pull-right glyphicon glyphicon-remove food-saved-remove"></span>'
+    ).insertAfter($labelCl);
+    $cloned.css('transform', 'scale(1.1)');
+    $mealContainer.find('.added-food').append($cloned);
+    $cloned.find('.divtoexpand').hide();
+    $item.find('.divtoexpand').slideUp();
+    $cloned.css('transform', 'scale(1)');
+
+    var history_obj = {
+      element: $cloned,
+      from: $mealContainer.find('.added-food'),
+      undo: function() {
+        $(this.element).detach();
+        futureArray.push(historyArray.pop());
+      },
+      redo: function() {
+        $(this.from).append($(this.element));
+        historyArray.push(futureArray.pop());
+      }
+    }
+    historyArray.push(history_obj);
+  }
+
 }
+/* ========================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^====================== */
+/* ========================|||||||||||-------ADD ITEM TO DAY----------||||||||||||====================== */
+/* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
+
 
 /////////////// DATE PICKER /////////////////////
 var today = new Date();
@@ -318,46 +438,51 @@ function dateChangeHandler() {
   $lunch = [];
   $dinner = [];
   $snack = [];
+  if (getDateRequestUrl !== undefined) {
+    $.ajax({
+      url: "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals/",
+      type: 'GET',
+      data: {
+        startDay: getFormattedDate()
+      },
+      success: updateDay
+    });
+  } else {
+    $.ajax({
+      url: 'dummyobj.json',
+      type: 'GET',
+      data: {
+        //date:  //yy.mm.dd
+      },
+      success: updateDay
+    });
+  }
 
-  $.ajax({
-    url: 'dummyobj.json',
-    type: 'GET',
-    data: {
-      //date: $newDate //yy.mm.dd
-    },
-    success: function(res) {
-
-      $.each(res.meals, function(ind, obj) {
-        if (obj.mealType == "BREAKFAST") {
-          $breakfast = obj.foodConsumptions;
-        }
-        if (obj.mealType == "LUNCH") {
-          $lunch = obj.foodConsumptions;
-        }
-        if (obj.mealType == "DINNER") {
-          $dinner = obj.foodConsumptions;
-        }
-        if (obj.mealType == "SNACK") {
-          $snack = obj.foodConsumptions;
-        }
-      });
-      updateDay();
-    }
-  });
-
-  function updateDay() {
-    console.log($breakfast);
-
-    if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {
-      $('.day-container').fadeOut().remove();
-      $newDay = $('.day-container-template').clone();
-      $('.content').append($newDay);
-      $newDay.attr('class', 'row').addClass('day-container').attr(
-        'data-date', $newDate).fadeIn();
-    } else {
-      $('.day-container').fadeOut();
-      $('.day-container[data-date="' + $newDate + '"]').fadeIn();
-    }
+  function updateDay(res) {
+    $.each(res.meals, function(ind, obj) {
+      if (obj.mealType == "BREAKFAST") {
+        $breakfast = obj.foodConsumptions;
+      }
+      if (obj.mealType == "LUNCH") {
+        $lunch = obj.foodConsumptions;
+      }
+      if (obj.mealType == "DINNER") {
+        $dinner = obj.foodConsumptions;
+      }
+      if (obj.mealType == "SNACK") {
+        $snack = obj.foodConsumptions;
+      }
+    });
+    /*if ($('.day-container[data-date="' + $newDate + '"]').length == 0) {*/
+    $('.day-container').fadeOut().remove();
+    $newDay = $('.day-container-template').clone();
+    $('.content').append($newDay);
+    $newDay.attr('class', 'row').addClass('day-container').attr(
+      'data-date', $newDate).fadeIn();
+    /*  } else {
+        $('.day-container').fadeOut();
+        $('.day-container[data-date="' + $newDate + '"]').fadeIn();
+      }*/
 
     function foodItemGenerate(label, amount, unit) {
       $item = $('.food-li-template').clone();
@@ -368,7 +493,7 @@ function dateChangeHandler() {
       $item.attr('data-amount', amount);
       $item.attr('data-unit', unit);
       $perTag = $item.find('.per-tag').text(amount + ' ' + unit).detach();
-      $item.find('.food-label').text(label).append($perTag);
+      $item.find('.food-label').text(label + '  ').append($perTag);
 
       return $item;
     }
@@ -379,7 +504,6 @@ function dateChangeHandler() {
       $amount = val.quantity;
       $unit = val.unit.name;
 
-      console.log($label);
       $newDay.find('.breakfast').find('.added-food').append(
         foodItemGenerate($label, $amount, $unit));
     });
@@ -411,27 +535,13 @@ function dateChangeHandler() {
 }
 /////////////// DATE PICKER /////////////////////
 
-var CalcUserData = function() {
-  this.dates = [];
-  this.meals = [];
-  this.food = [];
 
-  this.addFood = function() {
+/*function wrapToJson(dayContainerElement) {
+  $(dayContainerElement).find('.breakfast');
 
-  };
-  this.removeFood = function() {
+  $meals = [];
+  $userId;
 
-  };
-  this.addDate = function() {
-
-  };
-  this.reportChanges = function() {
-
-  };
-}
-
-function wrapToJson(dayContainerElement) {
-  $(dayContainerElement).find('.breakfast')
 
   function saveLists(meal) {
     $foods = $(dayContainerElement).find('.' + meal).find('.added-food').find(
@@ -447,8 +557,11 @@ function wrapToJson(dayContainerElement) {
       $unit = val.attr('data-unit');
       $ndbno = val.attr('data-food-db-no');
       foodObject = {
-        foodName: $label,
-        ndbno: $ndbno,
+        food: {
+          name: $label,
+          id: $ndbno,
+          jsonData: '{sample json data}'
+        },
         amount: $amount,
         unit: $unit
       };
@@ -456,38 +569,22 @@ function wrapToJson(dayContainerElement) {
     });
   }
 }
-/* userData = {
-  user: {
-    userid: 'UserId',
-    dates: [{
-      date: date();
-      meals: {
-        breakfast: [foodsArray],
-        launch: [foodsArray],
-        dinner: [foodsArray],
-        snacks: [foodsArray]
-      },
-      excercises: [excercisesArray]
-    }]
-  }
-}
-food = {
-  label: "string",
-  ndbno: "number",
-  amount: "number",
-  unit: "string",
-  value: "gram equivalent of amount/unit"
-}
 */
 $(document).on('click', '.food-saved-remove', function() {
   $element = $(this).parent();
   $from = $(this).closest('.day-row');
-  $element = $element.detach();
+  $clone = $element.clone();
+  $element.slideUp(300, function() {
+    $(this).detach();
+  });
+  $.notify('You can undo by: CTLR+Z');
   var history_obj = {
-    element: $element,
+    element: $clone,
     removedFrom: $from,
-    restore: function() {
+    undo: function() {
       $(this.removedFrom).find('.added-food').append($(this.element));
+      $(this.element).css('display', 'none').slideDown();
+      $.notify('You can redo by: CTLR+Y');
       futureArray.push(historyArray.pop());
     },
     redo: function() {
@@ -501,9 +598,239 @@ $(document).on('click', '.food-saved-remove', function() {
 $(document).on('keypress', function(e) {
   //  console.log(e);
   if (e.ctrlKey && e.keyCode == 26) {
-    historyArray[historyArray.length - 1].restore();
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
   if (e.ctrlKey && e.keyCode == 25) {
-    futureArray[futureArray.length - 1].redo();
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
 });
+$(document).on('keypress', function(e) {
+  //  console.log(e);
+  if (e.ctrlKey && e.keyCode == 26) {
+    if (historyArray.length !== 0) {
+      historyArray[historyArray.length - 1].undo();
+    }
+  }
+  if (e.ctrlKey && e.keyCode == 25) {
+    if (historyArray.length !== 0) {
+      futureArray[futureArray.length - 1].redo();
+    }
+  }
+});
+
+
+$(document).on('click', '.add-exercise', function() {
+  $('#add-exercise-panel').slideToggle();
+});
+
+$(document).on('keyup', '#exercise-search-input', searchExercise);
+
+function searchExercise(e) {
+  $query = encodeURIComponent($('#exercise-search-input').val());
+  if (exerciseSearchUrl !== undefined) {
+    $.ajax({
+      type: "GET",
+      url: 'http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities',
+      data: {
+        keyword: $query
+      },
+      success: listResponse,
+      error: function(results) {
+        $.notify({
+          message: 'Call returned an error: It may be endpoint, https error or local access restriction. Therefore a representational list loaded below not results'
+        }, {
+          type: 'warning'
+        });
+        $.getJSON('exercse-res.json', listResponse);
+      }
+    });
+  } else {
+    $.getJSON('exercse-res.json', listResponse);
+  }
+
+  function listResponse(res) {
+    if (res.errors) {
+      $('.search-result-panel-exercise').slideUp();
+    } else {
+      $('.search-result-panel-exercise').slideDown();
+      $list = $('.search-result-list-exercise');
+      $list.find('li').fadeOut('fast', function() {
+        $(this).remove();
+      });
+
+      var listArray = res;
+      $.each(listArray, function(index, item) {
+        var li_element = document.createElement(
+          'li');
+        li_element.classList.add('list-group-item');
+
+        li_element.setAttribute('data-activity-id',
+          item.activityId);
+
+        $(li_element).html(
+          "<i class='fa fa-bicycle'></i><span>" +
+          item.description + "</span>").
+        find('span').addClass('exercise-label').css('display',
+          'inline-block').
+        css('width', '80%').parent().find('i').css('padding',
+          '5px');
+
+        $list.append(li_element);
+        $(li_element).css('display', 'none')
+        $(li_element).slideDown();
+      });
+
+    }
+  }
+}
+
+$(document).on('click', '.search-result-list-exercise li', function(e) {
+
+  $element = $(this);
+  $val = $(this).text();
+  $dbid = $(this).attr('data-food-db-no');
+  if ($element.find('.divtoexpand').length == 0) {
+    $.ajax({
+      url: 'activity-detail.json',
+      type: 'GET',
+      success: function(res) {
+        var divToExpand = document.createElement('ul');
+        $(divToExpand).css('display', 'none').css(
+          'background-color', '#f3f3f3').css('padding',
+          '15px').css('color', '#313534').css('margin',
+          '10px 0 0 0').addClass('divtoexpand');
+        /*res = {
+          activityId: 195,
+          calorieBurnPerHour: 817.0,
+          description: 'asd'
+        };*/
+
+        var div3 = document.createElement('div');
+        $(div3).addClass('col-sm-3');
+        var input = document.createElement('input');
+        $(input).addClass('form-control').addClass(
+          'exercise-minutes').attr('type', 'text');
+
+
+
+        $(divToExpand).html(
+          '<div class="col-sm-3"><strong>Amount:</strong></div>'
+        );
+        $(div3).append(input);
+        $(divToExpand).append(div3);
+
+        $element.attr('data-kcal-per-hour', res.calorieBurnPerHour);
+
+        var buttonDiv = document.createElement('div');
+        var addExerciseButton = document.createElement('button');
+        $(addExerciseButton).addClass('btn').addClass('btn-sm').addClass(
+          'btn-primary').addClass('add-exercise-save').html(
+          'Add Exercise');
+        $(buttonDiv).addClass('col-sm-3').append($(
+          addExerciseButton));
+        var caloriLabel = document.createElement('div');
+        $(caloriLabel).addClass('col-sm-3').html(
+          "<span class=calories> 0.00 </span><span class='per-tag'>/kcal</span>"
+        );
+
+        $(addExerciseButton).on('click', addExercise);
+        $(divToExpand).append($(caloriLabel)).append($(buttonDiv)).append(
+          '<br/><hr/>');
+
+        /* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
+        /* ========================|||||||||||-------ADD ITEM TO DAY----------||||||||||||====================== */
+        /* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
+        function addExercise(e) {
+          if (exerciseSubmitUrl !== undefined) {
+            $.ajax({
+              type: "GET",
+              url: 'http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/',
+              data: {
+                dummy: "dummy"
+              },
+              success: function(res) {
+                dateChangeHandler();
+              },
+              error: function(results) {
+                $.notify({
+                  message: 'There was an error therefore item only seems added for developing purposes.'
+                }, {
+                  type: 'warning'
+                });
+                addByDom();
+              }
+            });
+          } else {
+            addByDom();
+          }
+
+          function addByDom() {
+            $liItem = $(e.currentTarget).closest('.list-group-item');
+            $clonedEx = $liItem.clone();
+
+            $minutes = $liItem.find('.exercise-minutes').val();
+
+            $clonedEx.attr('data-minutes', $minutes);
+            $labelCl = $clonedEx.children('span');
+            $labelCl.append('&nbsp;&nbsp;<span class="per-tag">' +
+              $minutes + ' ' +
+              'minutes' +
+              '</span>');
+            $(
+              '<span class="pull-right glyphicon glyphicon-remove exercise-saved-remove"></span>'
+            ).insertAfter($labelCl);
+            $clonedEx.find('.divtoexpand').remove();
+            $clonedEx.css('transform', 'scale(1.2)');
+            $('.added-exercise').append($clonedEx).find(
+              '.list-group-item').css('transform', 'scale(1)');
+          }
+
+          $liItem.find('.divtoexpand').slideUp();
+        }
+        /* ========================^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^====================== */
+        /* ========================|||||||||||-------ADD ITEM TO DAY----------||||||||||||====================== */
+        /* ========================|||||||||||||||||||||||||||||||||||||||||||||||||||||||====================== */
+        $(input).on('keyup paste', function(e) {
+          $minutes = $(e.target).val();
+          $tagToUpdate = $(e.target).closest('.divtoexpand').find(
+            '.calories');
+          $calorieBurnPerHour = $(e.target).closest(
+            '.list-group-item').attr('data-kcal-per-hour');
+          $tagToUpdate.text(_2Decimals((+$calorieBurnPerHour /
+            60) * +$minutes));
+          console.log($minutes);
+
+        });
+
+        $element.append($(divToExpand));
+        $(divToExpand).slideDown();
+      }
+
+    })
+  } else {
+    $element.find('.divtoexpand').slideToggle();
+  }
+});
+
+$(document).on('click', '.close-exercise-panel', function() {
+  $('#add-exercise-panel').slideUp();
+});
+
+
+/*
+$.ajax({
+  type: "GET",
+  url: 'URL',
+  data: theData,
+  success: function(res) {
+
+  },
+  error: function(results) {
+
+  }
+});
+*/
