@@ -820,6 +820,31 @@ $(document).on('click', '.close-exercise-panel', function() {
   $('#add-exercise-panel').slideUp();
 });
 
+$(document).on('click', '.exercise-saved-remove', function() {
+  $element = $(this).parent();
+  $from = $(this).closest('.day-row');
+  $clone = $element.clone();
+  $element.slideUp(300, function() {
+    $(this).detach();
+  });
+  $.notify('You can undo by: CTLR+Z');
+  var history_obj = {
+    element: $clone,
+    removedFrom: $from,
+    undo: function() {
+      $(this.removedFrom).find('.added-exercise').append($(this.element));
+      $(this.element).css('display', 'none').slideDown();
+      $.notify('You can redo by: CTLR+Y');
+      futureArray.push(historyArray.pop());
+    },
+    redo: function() {
+      $(this.element).detach();
+      historyArray.push(futureArray.pop());
+    }
+  };
+  historyArray.push(history_obj);
+
+});
 
 /*
 $.ajax({
