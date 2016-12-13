@@ -7,9 +7,9 @@ var exerciseSubmitUrl = undefined;
 var getDateRequestUrl = undefined;
 
 
-//var foodSearchUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods?q="; //+query
-//var foodDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods/"; //+ndbno
-//var addFoodSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals";
+var foodSearchUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods?q="; //+query
+var foodDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/foods/"; //+ndbno
+var addFoodSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals";
 // (POST) + {	"userId": 1,
 //	"foodId": "45044776",
 //	"quantity": 2,
@@ -20,10 +20,10 @@ var getDateRequestUrl = undefined;
 var exerciseSearchUrl =
   "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities?keyword=";
 //+query
-//var exerciseDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+acitivity Id
-//var exerciseSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+some object
+var exerciseDetailRequestUrl ="http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+acitivity Id
+var exerciseSubmitUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/activities/"; //+some object
 //============================================
-//var getDateRequestUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals/?startDay="; // +YYYYMMDD
+var getDateRequestUrl = "http://fatappenv.eu-central-1.elasticbeanstalk.com/webapi/users/1/meals/?startDay="; // +YYYYMMDD
 //============================================*/
 
 function _2Decimals(num) {
